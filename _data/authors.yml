@@ -1,0 +1,18 @@
+## Template › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/advanced-usage.md#setting-author-url
+# -------------------------------------
+# {author_id}:
+#   name: {full name}
+#   twitter: {twitter_of_author}
+#   url: {homepage_of_author}
+# -------------------------------------
+
+thu4n:
+  name: thu4n
+  facebook: thuanlawibu
+  url: https://github.com/thu4n
+ahamonuser:
+  name: ahamonuser
+  url: https://github.com/Ahamonuser
+howtodie:
+  name: howtodie123
+  url: https://github.com/howtodie123
