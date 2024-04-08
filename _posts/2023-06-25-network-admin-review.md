@@ -2,7 +2,7 @@
 title: Ôn tập Quản trị mạng và hệ thống - Viết gì vào tờ A4?
 date: 2023-06-25 23:56:00 +0700
 author: thu4n
-categories: [Learning]
+categories: [Blogging, Learning]
 tags: [computer network, network administration, sysadmin]
 mermaid: true
 math: true

@@ -2,7 +2,7 @@
 title: Game UIT Hackathon 2022 - the biggest joke of the year
 date: 2022-12-28 16:55:00 +0700
 author: thu4n
-categories: [Blogging]
+categories: [Blogging, Competition]
 tags: [game uit hackathon, competitions, hackathon, green constitution]
 ---
 ## What is Game UIT Hackathon?
