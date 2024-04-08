@@ -2,7 +2,7 @@
 title: Ôn tập Nhập môn Mạng - Tầng Data link
 date: 2023-02-04 23:50:00 +0700
 author: thu4n
-categories: [Learning]
+categories: [Blogging, Learning]
 tags: [computer network, data link layer]
 mermaid: true
 math: true

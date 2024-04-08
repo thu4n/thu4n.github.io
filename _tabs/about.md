@@ -1,5 +1,6 @@
 ---
 order: 5
+icon: fas fa-info-circle
 image: /assets/img/other/network-cu-lao.png
 ---
 
