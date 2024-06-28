@@ -217,7 +217,7 @@ $$availability = \frac{mean(uptime)}{mean(uptime) + mean(downtime)}$$
 
 Below is the classification of clusters, the A/P and A/A we have just discussed belong to HA clusters. We will go into more details of these cluster types in the subsequent sections.
 
-![](cluster_classification.png)
+![](/assets/img/other/distributed-computing-review/cluster_classification.png)
 
 
 ### High Availability Clustering
@@ -310,7 +310,7 @@ We also have **Gearmean**, a framework for developing distributed applications w
 	- Job Server assign jobs of the clients to the Workers
 	- Worker register themselves at Job Servers and execute jobs
 	
-![](gearman_roles.png)
+![](/assets/img/other/distributed-computing-review/gearman_roles.png)
 - Gearman should only be used in secure private networks since the communication is **not encrypted** (port 4730) and it has no mechanism for the authentication.
 - Clients and workers access shared data. Cluster file systems like GlusterFS or protocols such as NFS or Samba can be used.
 
