@@ -206,7 +206,9 @@ Drawbacks:
 **Fields of application**
 - High performance (scalability): Achieve by redundancy of nodes, avoiding a single point of failure.
 - High availability:  It is not sufficient to use redundant nodes and redundant hardware inside the nodes; Uninterruptible power supplys (UPS) are require as well as protection against improper use, and sabotage. The availability of a system is calculate as follows:
+
 $$availability = \frac{mean(uptime)}{mean(uptime) + mean(downtime)}$$
+
 - High throughput
 
 **Behavior in the event of failed nodes**
@@ -278,6 +280,7 @@ In Beowulf:
 - The cluster is controlled via a master node.
 - Worker nodes are only accessible via the network connection (no I/O devices)
 - Worker nodes contain commodity PC components and are not redundant
+
 ### High Throughput Clustering
 
 Cluster consists of servers, which are used to process incoming requests, not used for extensive calculations (Tasks must **not** be split into sub-tasks).
