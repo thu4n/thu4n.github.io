@@ -175,6 +175,145 @@ In **shared memory** system:
 
 ## II. Cluster and grid.
 
+### Cluster definition
+
+A cluster consists of at least 2 nodes. The nodes are connected via a computer network. Often, the nodes are under the control of a master and are attached to a shared storage.
+
+From the user perspective, the cluster works like a single system => a virtual uniprocessor system (they don't know it's a cluster).
+
+If the nodes are only available at specific times (working hours), the cluster is called Clusters of workstations (COWs) or Network of Workstations (NOWs).
+
+Advantages: 
+- Flexibility and extensibility
+- Lower purchase price campared with supercomputers
+- Simple replacement of commodity hardware components
+
+Drawbacks:
+- Errors occur more often compared with a single supercomputer
+- Clusters consist of many independent systems => Higher administrative costs
+- High effort for distributing and controlling applications
+
+### Distinguishing Criteria of Clusters
+
+**Structure**
+- Homogeneous structure: One OS across the cluster 
+- Heterogeneous structure: Different OS in the cluster => A really bad idea, managing will be hell.
+
+**Installation concept**
+- Glass-house: The cluster is located in a single room or server rack => Better access and maintenance but in case of power failure, the entire thing goes down.
+- Campus-wide: The nodes are located in multiple buildings and spread across the site of the research center or company =>Hard to fail completely but impossible to use high performance network between nodes.
+
+**Fields of application**
+- High performance (scalability): Achieve by redundancy of nodes, avoiding a single point of failure.
+- High availability:  It is not sufficient to use redundant nodes and redundant hardware inside the nodes; Uninterruptible power supplys (UPS) are require as well as protection against improper use, and sabotage. The availability of a system is calculate as follows:
+$$availability = \frac{mean(uptime)}{mean(uptime) + mean(downtime)}$$
+- High throughput
+
+**Behavior in the event of failed nodes**
+- Active/Passive: During normal operation, at least a single node is in passive state (bro doesn't do anything). If a node fails, the passive node takes over its services.
+- Active/Active: All nodes are in active state and run the same services. If nodes fail, the remaining active nodes need to take over their tasks.
+
+	Comparision between the two: A/P obviously doesn't utilize all the available performance as some are passive nodes. Meanwhile, services in A/A must be designed for cluster operation because all nodes access shared data simultaneously.
+
+Below is the classification of clusters, the A/P and A/A we have just discussed belong to HA clusters. We will go into more details of these cluster types in the subsequent sections.
+
+![](cluster_classification.png)
+
+
+### High Availability Clustering
+
+**Failover**: Ability (usually provided by the OS) to automatically transfer the tasks of a failed node to another node for minimizing the downtime. Example: Heartbeat for Linux.
+
+**Failback**: If failed nodes are operational again, they report their status to the load balancer and get new jobs assigned in the future.
+
+The **Split Brain** problem: When communication between cluster nodes is severed, they enter a split-brain state. Each node is unaware of the others and believes itself to be the sole active node (primary node) in the cluster. This could lead to Data inconsistency, Reduced availability and Conflicting decisions.
+
+There are 2 architectures of High Availability Clustering:
+- Shared Nothing => Distributed Storage
+- Shared Disk => Shared Storage
+
+#### Shared Nothing
+
+In a Shared Nothing cluster, each node has its own storage resource. Even, when a resource is physically connected to multiple nodes, only a single node is allowed to access it.
+
+- Advantage: No lock management is required, no protocl overhead and in theory, can scale in a linear way.
+
+- Drawback: Money for storage.
+
+Distributed Replicated Block Device (DRBD), which operates at **block** level inside the Linux kernel, is a free software to build up a network storage for Shared Nothing clusters, without an expensive Storage Area Network (SAN). **Shared storage is always a single point of failure**, since only the cluster nodes are designed in a redundant way.
+
+RBD can be used as a basis for:
+- Conventional file systems, such as ext3/4 or ReiserFS
+- Shared-storage file systems, such as Oracle Cluster File System (OCFS2) and Global File System (GFS2)
+- Another logical block device, such as the Logical Volume Manager (LVM)
+
+Shared Nothing with DRB: 
+- A primary server and a secondary server exist. Write requests are carried out by the primary server and afterwards are send to the secondary server. If the secondary reports successful writing, the primary reports the end of the operation.
+- Practically, it implements RAID 1 via TCP. If the primary fails, the secondary becomes the primary.
+- Read access is always carried out locally => better performance.
+
+#### Shared Disk
+
+In a Shared Disk cluster, all nodes have access to a shared storage. Some methods of connecting the nodes to the storage:
+- SAN (Storage Area Network) via Fibre Channel: Expensive but high performance. Provides block-level access.
+- NAS (Network Attached Storage): Easy to use, provides file system-level access, can be implemented as a pure software solution.
+- iSCSI (Internet Small Computer System Interface): Use SCSI protocol via TCP/IP, provides SAN-like access via the IP-network
+
+### High Performance Clustering
+
+Typical application area:
+- Applications which implement the Divide and Conquer principle.
+- Applications used for analyzing large amounts of data
+
+Examples: Rendering a Pixar movie,  flight path calculation, prime number computation, etc.
+
+Advantages: Low price and vendor independence, easy to increase the performance in a short time via additional nodes, defective components can be obtained in a quick and inexpensive way.
+
+Drawback: High administrative and maintenance costs, compared with mainframes
+
+If a free operating system is used => **Beowulf** cluster. If Windows (paid and evil OS) => **Wulfpack**.
+
+In Beowulf:
+- It is never a cluster of workstations, nodes of a Beowulf cluster are used only for the cluster.
+- The cluster is controlled via a master node.
+- Worker nodes are only accessible via the network connection (no I/O devices)
+- Worker nodes contain commodity PC components and are not redundant
+### High Throughput Clustering
+
+Cluster consists of servers, which are used to process incoming requests, not used for extensive calculations (Tasks must **not** be split into sub-tasks).
+
+Typical fields of application:
+- Web servers
+- Search engines
+
+Large compute jobs => High Performance Cluster
+
+Multiple small compute jobs (in a short time) => High Throughput Cluster
+
+### Libraries for Cluster Applications
+
+Popular message passing systems:
+
+|                  |      Parallel Virtual Machine (PVM)      |         Message Passing Interface (MPI)         |
+| :--------------: | :--------------------------------------: | :---------------------------------------------: |
+|     Purpose      | Provides a uniform programming interface | Collection of functions to simplify development |
+| Language support |         C/C++ and Fortran 77/90          |                   Same as PVM                   |
+|   Environment    |              Heterogeneous               |                   Homogeneous                   |
+|      Focus       |               Portability                |            Performance and security             |
+
+> Đoạn này trong slideset 02 là có gần 30 slide nói chi tiết về code và function của MPI. Vì sức khỏe tinh thần, mình từ chối xem qua đống đó nên các bạn có thể tự tham khảo từ slide thứ 42 nếu muốn.
+{: .prompt-warning }
+
+We also have **Gearmean**, a framework for developing distributed applications which supports C, Pearl, PHP, Python, C#, Java, .NET and UNIX shell.
+- Assigns one of 3 roles to every computer involved:
+	- Clients transfer jobs to the Job Servers
+	- Job Server assign jobs of the clients to the Workers
+	- Worker register themselves at Job Servers and execute jobs
+	
+![](gearman_roles.png)
+- Gearman should only be used in secure private networks since the communication is **not encrypted** (port 4730) and it has no mechanism for the authentication.
+- Clients and workers access shared data. Cluster file systems like GlusterFS or protocols such as NFS or Samba can be used.
+
 ## III. Cloud computing
 
 ### IaaS
