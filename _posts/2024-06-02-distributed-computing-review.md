@@ -173,7 +173,7 @@ In **shared memory** system:
 - Most multiprocessor systems today operate according to the **symmetric** multiprocessing (SMP) principle. This allows dynamically distributing the running processes to all available CPUs and they can acess the memory with the same speed.
 - In **asymmetric** multiprocessing principle, each CPU must be assigned to a fixed task. Some run the OS, the remaining run the other processes.
 
-## II. Cluster and grid.
+## II. Cluster.
 
 ### Cluster definition
 
@@ -471,5 +471,245 @@ A few popular SaaS providers: Google Workspace, GitHub, Salesforce, Zoho, eyeOS,
 {: .prompt-warning }
 
 ## IV. Hadoop
+
+### Definition
+
+Big Data is a collection of large datasets that cannot be processed using traditional computing techniques. It is not a single technique or a tool, rather it involves many areas of business and technology.
+
+To handle this big boy, we need an infrastructure that can manage and process huge volumes of structured and unstructured data in real-time and can protect data privacy and security. For Analytical Big Data, there are sytems such as Massively Parallel Processing (MPP) database systems and Map Reduce algorithm.
+
+This Map Reduce algorithm divides the task into small parts and assigns them to many computers, and collects the results from them which when integrated, form the result dataset.
+
+**Hadoop**, the yellow elephant of evil, is an Apache open source framework written in Java that allows distributed processing of large datasets across clusters of computers using the MapReduce algorithm. It is essentially a distributed computing platform.
+
+![](/assets/img/other/distributed-computing-review/hadoop_logo.png)
+
+At its core, Hadoop has two major layers, namely:
+- Processing/Computation layer (MapReduce)
+- Storage layer (Hadoop Distributed File System)
+
+### HDFS
+
+ > A Distributed File System (DFS) is a file system that allows files from multiple hosts sharing via a computer network. It supports concurrency and may include facilities for transparent replication and fault tolerance.
+{: .prompt-info }
+
+The Hadoop Distributed File System (HDFS) is based on the Google File System (GFS). Its main features:
+- Support Petabyte size of data
+- Heterogeneous - Could be deployed on different hardware
+- Streaming data access via batch processing
+- Coherency model - Write-once-read-many
+- Data locality - “Moving Computation is Cheaper than Moving Data”
+- Fault-tolerance
+
+#### Architecture
+
+![](/assets/img/other/distributed-computing-review/hdfsarchitecture.gif)
+
+**Namenode**
+
+Each cluster has one Namenode. This is the commodity hardware that contains the GNU/Linux operating system and the namenode software. The system having the namenode acts as the master server and it does the following tasks: 
+- Manages the file system namespace
+- Regulates client’s access to files.
+- Executes file system operations such as renaming, closing, and opening files and directories.
+
+**Datanode**
+
+Same hardware as namenode but runs the datanode software instead. For every node in the cluster, there will be a data node (n nodes => n data nodes). These nodes manage the data storage of their system. They perform read-write operations and also perform block creation, deletion, and replication according to the instructions of the namenode.
+
+**Block**
+
+The file in HDFS will be divided into one or more blocks and/or stored in individual data nodes.  In other words, the minimum amount of data that HDFS can read or write is called a Block. The default block size is 64MB but this can be changed via configuration. All blocks in a file **except the last block** are the same size.
+
+**File System Namespace**
+
+Traditional hierarchical file organization, does not support hard or soft linking.
+
+#### Implementation
+
+**Data (block) replication**
+- Blocks of a file are replicated for fault tolerance. The block size and replication factor are configurable per file. 
+- The NameNode makes all decisions regarding replication of blocks. It periodically receives a Heartbeat and a Blockreport from each of the DataNodes in the cluster. Receipt of a Heartbeat implies that the DataNode is functioning properly. A Blockreport contains a list of all blocks on a DataNode.
+
+![](assets/img/other/distributed-computing-review/hdfsdatanodes.gif)
+
+In the image above, the two commands specify that:
+- Block of 1 and 3 in `../data/part-0` need to have 2 replicas `r:2, {1,3}`
+- Block of 2, 4, and 5 in `../data/part-1` need to have 3 replicas `r:3, {2,4,5}`
+
+**Replica Placement**
+
+It follows Rack-aware replica placement policy:
+- Data reliability
+- Availability
+- Network bandwidth utilization
+
+A simple but non-optimal policy is to place replicas on unique racks. This prevents losing data when an entire rack fails and allows use of bandwidth from multiple racks when reading data. However, this policy increases the cost of writes because a write needs to transfer blocks to multiple racks.
+
+For the common case, when the replication factor is three, HDFS’s placement policy is to put one replica on one node in the local rack, another on a node in a different (remote) rack, and the last on a different node in the same remote rack. 
+
+**Data locality**
+
+Data locality in Hadoop is the process of moving the computation close to where the actual data resides instead of moving large data to computation. This minimizes overall network congestion. This also increases the overall throughput of the system.
+
+### Map Reduce
+
+#### Map Reduce workflow
+
+A MapReduce job usually splits the input data-set into independent chunks which are processed by the **map tasks** in a completely parallel manner. The framework sorts the outputs of the maps, which are then input to the **reduce tasks**. Typically both the input and the output of the job are stored in a file-system. The framework takes care of scheduling tasks, monitoring them and re-executes the failed tasks.
+
+The MapReduce framework consists of a single **master JobTracker** and one **slave TaskTracker** per cluster-node. The master is responsible for scheduling the jobs' component tasks on the slaves, monitoring them and re-executing the failed tasks. The slaves execute the tasks as directed by the master.
+
+![](assets/img/other/distributed-computing-review/map-reduce-architecture.png)
+
+Minimally, applications specify the input/output locations and supply map and reduce functions via implementations of appropriate interfaces and/or abstract-classes. These, and other job parameters, comprise the job configuration. The Hadoop job client then submits the job (jar/executable etc.) and configuration to the JobTracker which then assumes the responsibility of distributing the software/configuration to the slaves (TaskTracker), scheduling tasks and monitoring them, providing status and diagnostic information to the job-client.
+
+**Summary:** Application specifies information for input/output, etc => a Job, then submit this Job to the JobTracker. The JobTracker assigns TaskTrackers for the job execution. Now, the data of the job got splits into chunks and it goes through the Map phase then the Reduce phase.
+
+#### Inputs and Outputs
+
+The MapReduce framework operates exclusively on `<key, value>` pairs, that is, the framework views the input to the job as a set of `<key, value>` pairs and produces a set of `<key, value>` pairs as the output of the job, conceivably of different types.
+
+Input and Output types of a MapReduce job:
+
+`(input) <k1, v1> -> map -> <k2, v2> -> combine -> <k2, v2> -> reduce -> <k3, v3> (output)`
+
+#### Wordcount example
+
+The WordCount application is quite straight-forward, [view source code here](https://gist.github.com/StephanieMak/cb9aab665ee635e62b05) (You don't need to understand the code, this section is only for explaining the workflow of MapReduce in more details).
+
+Example input:
+
+```
+# File 1
+Hello World Bye World
+# File 2
+Hello Hadoop Goodbye Hadoop
+```
+
+The **Mapper** implementation, via the map method , processes one line at a time, as provided by the specified TextInputFormat. It then splits the line into tokens separated by whitespaces and emits a key-value pair of `< <word>, 1>`.
+
+For the given sample input the first map emits:
+```
+< Hello, 1>
+< World, 1>
+< Bye, 1>
+< World, 1>
+```
+
+The second map emits:
+
+```
+< Hello, 1>
+< Hadoop, 1>
+< Goodbye, 1>
+< Hadoop, 1>
+```
+
+WordCount also specifies a **combiner**. Hence, the output of each map is passed through the local combiner for local aggregation, after being sorted on the keys (Basically, if it's the same word, combine them and `value + 1`).
+
+The output of the first map:
+
+```
+< Bye, 1>
+< Hello, 1>
+< World, 2>
+```
+
+The output of the second map:
+
+```
+< Goodbye, 1>
+< Hadoop, 2>
+< Hello, 1>
+```
+
+The **Reducer** implementation, via the reduce method just sums up the values, which are the occurence counts for each key (i.e. words in this example).
+
+Thus the output of the job is:
+
+```
+< Bye, 1>
+< Goodbye, 1>
+< Hadoop, 2>
+< Hello, 2>
+< World, 2>
+```
+
+> In this example, the Reducer behaves the same as the Combiner.
+{: .prompt-info }
+
+### Hbase
+
+HBase is an open-source, distributed, non-relational database modeled after Google's Bigtable. It consists of tables of **column-oriented rows**.
+
+Hbase has easy integration with Hadoop MapReduce(MR) since the Table input and output formats are compatible.
+
+#### Architecture
+
+![](assets/img/other/distributed-computing-review/hba1.png)
+
+Key components:
+- HMaster: This is the central coordinator in the HBase cluster. It manages the overall health of the cluster, assigns regions (data partitions) to Region Servers, and balances the load across servers.
+- RegionServer (TabletServer):
+	- Serving Regions assigned to Regionserver 
+	- Handling client read and write requests
+	- Flushing cache to HDFS
+	- Keeping Hlog
+- ZooKeeper: This is an external service that provides coordination and distributed locking (Locate -ROOT-region) for HBase operations. It helps in master election and recovery.
+- HDFS: All persistence Hbase storage is on HDFS(HFile, google Bigtable, SSTable). Hbase performnace is based on this guy's performance.
+
+In Hbase, Rows are stored in byte‐lexicographic sorted order and Tables dynamically split into “regions”. Each region contains values [startKey, endKey]
+
+#### Data model
+
+![](assets/img/other/distributed-computing-review/hbase_table.png)
+
+Data are stored in tables of rows and columns, where:
+- Columns are grouped into column families. A column name has the form `<family>:<label>`. Column family is the unit of performance tuning.
+- Rows are sorted by row key, the table's primary key
+- Cells are stored with timestamp for versioning. `(table, row, <family>:<label>, timestamp) ⟶ value`
+
+A table is viewed as a set of rows at the **conceptual level**. However, in **physical view**, a table is physically stored by the column family. If you want detail visuals, check out [this website](https://www.cloudduggu.com/hbase/data-model/). To put it simply, conceptual view is just your normal table with all the columns for each entry. In physical storage view, it is split into groups of column family, that means if the data has 3 families, you will see 3 small tables
+, each show their own column content.
+
+## V. Nội dung khác.
+
+Có một bài blog tổng hợp các câu hỏi về Apache Hadoop, các bạn có thể xem thêm [tại đây](https://demanejar.github.io/posts/hadoop-question/).
+
+Các chương nội dung trên mình vừa đi qua đã bao gồm hầu hết phần Lý thuyết của môn học này. Tuy nhiên, thầy nói sẽ hỏi nội dung liên quan tới các đề tài đồ án và tất nhiên, một bài blog nho nhỏ này không thể đi qua hết được. Dưới đây là một số link tài liệu của các đề tài mà mình chưa đề cập ở trên:
+- [OpenFaaS](https://docs.openfaas.com/architecture/gateway/)
+- [Apache CloudStack](https://docs.cloudstack.apache.org/en/4.19.0.0/conceptsandterminology/concepts.html#deployment-architecture-overview)
+- [Apache OpenWhisk](https://openwhisk.incubator.apache.org/documentation.html)
+- [AppScale](https://www.appscale.com/appscale-architecture/)
+
+Mình không nghĩ là đề sẽ ác tới mức mà hỏi chi tiết những đề tài trên, nên chỉ đề cập ở đây để có thể coi sơ qua, biết nó là gì, cung cấp service nào.
+
+Nội dung bài lab thì cũng có thể ra thi (không rõ nó như nào), tuy nhiên bài lab thì 2 công nghệ quan trọng nhất được học là **Docker** với **Kubernetes** rồi. Có thể cân nhắc xem thêm hai anh này để biết chúng làm gì.
+
+Gần 90% là đề thi sẽ hỏi đồ án trong phần tự luận, riêng cái này thì bạn nào có đóng góp nhiều trong đồ án thì chắc không cần lo lắm, chỉ cần đọc lại báo cáo đồ án của mình là được. Một chuyện đáng quan ngại là có thể sẽ hỏi đồ án của nhóm khác nhưng nghe hơi vô lý nên chắc không có đâu...
+
+Một câu tự luận cuối cùng đó là thiết kế giải pháp theo yêu cầu đề. Riêng câu này thì mình không có gì để chia sẻ rồi, nó phụ thuộc rất nhiều vào kinh nghiệm và kiến thức tổng quan của mỗi bạn để có thể đưa ra một giải pháp phù hợp cho vấn đề. Lời khuyên duy nhất là hãy chú trọng đến scalibilty, availability, security, và cost khi viết.
+
+Bài blog tới đây là hết, cảm ơn tất cả những ai đã dành thời gian ra đọc tới đoạn này nhé. Chúc các bạn thi tốt!
+
+## Nguồn tham khảo.
+
+1. Slide môn học Hệ tính toán phân bố, UIT.
+2. Ebook Distributed system (4th): [https://www.distributed-systems.net/index.php/books/ds4/](https://www.distributed-systems.net/index.php/books/ds4/)
+3. [Apache MapReduce Tutorial](https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.html)
+4. [Apache HDFS Design](https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
