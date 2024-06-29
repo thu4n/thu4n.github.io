@@ -32,9 +32,6 @@ Bài thi có thời gian làm bài là **90 phút** và **không** sử dụng t
 
 Ngoài ra, các bạn nào học hệ Chất lượng cao sẽ được ưu ái làm bài thi bằng tiếng Anh nhé.
 
-> Một câu hỏi mình nghĩ có thể ra trong thi đó là hỏi xem thiết bị nào bên dưới thuộc kiểu X với X là 1 trong 4 kiểu client giới thiệu ở trên. Tuy nhiên khả năng thấp thôi do ví dụ trong slideset 01 nó khá cổ đại rồi.
-{: .prompt-info }
-
 ## I. Introduction and fundamental laws
 
 ### Client-Server
