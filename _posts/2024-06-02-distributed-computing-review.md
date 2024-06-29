@@ -304,7 +304,7 @@ Popular message passing systems:
 |   Environment    |              Heterogeneous               |                   Homogeneous                   |
 |      Focus       |               Portability                |            Performance and security             |
 
-> Đoạn này trong slideset 02 là có gần 30 slide nói chi tiết về code và function của MPI. Vì sức khỏe tinh thần, mình từ chối xem qua đống đó nên các bạn có thể tự tham khảo từ slide thứ 42 nếu muốn.
+> Đoạn này trong slideset 02 là có gần 30 slide nói chi tiết về code và function của MPI. Vì sức khỏe tinh thần, mình từ chối xem qua đống đó nên các bạn có thể tự tham khảo từ slide thứ 42 nếu muốn. Ở phần nội dung này mình nghĩ chỉ hỏi trắc nghiệm so sánh 2 bộ thư viện nói trên.
 {: .prompt-warning }
 
 We also have **Gearmean**, a framework for developing distributed applications which supports C, Pearl, PHP, Python, C#, Java, .NET and UNIX shell.
@@ -319,11 +319,156 @@ We also have **Gearmean**, a framework for developing distributed applications w
 
 ## III. Cloud computing
 
+### Definition
+
+Cloud computing is the on-demand delivery of computing services – like servers, storage, databases, networking, software, analytics, and intelligence – over the internet ("the cloud"). Essentially, instead of having your own physical hardware and software, you rent virtual resources from a cloud provider.
+
+The fundamental techonologies of cloud computing includes:
+- **Virtualization**: An abstract, logical perspective of physical resources (hide away the physical hardware). Usually it is an abstraction for the four computing resources - Storage, Processing power, Memory and Network.
+- **Web services**: enable weakly coupled, asynchronous and messages-based communication, based on HTTP and XML. Most popular applications for web services include:
+	- RPC - Remote Procedure Calls (nowadays, gRPC is the more popular choice),
+	- SOAP - Simple Object Access Protocol, XML based and the message is stored in the body of a HTTP POST request.
+	- REST - REpresentational State Transfer, request via HTTP interface for **stateless** communication.
+
+Cloud computing is an umbrella term for different services as mentioned before. Each of these service should be defined via a service level agreement (SLA) and will be offered as a product to the customers. If the service is provided by the company's own department => **inhouse**. If it is provided by an external provider => **outsourcing**
+
+Types of cloud:
+- Public Cloud: Customer and provider belong to different organizations (Outsourcing) 
+- Private Cloud: Customer and provider belong to the same organization. Costs are similar to a non-Cloud-based architecture 
+- Hybrid Cloud: Public and private Clouds are used together. A good example would be handling traffic load with public cloud but store data in your private cloud.
+
+Cloud services if defined by their funcitonality:
+- Infrastructure as a Service (IaaS)
+- Platform as a Service (PaaS)
+- Software as a Service (SaaS)
+
+![](/assets/img/other/distributed-computing-review/iaas-paas-saas.png)
+
 ### IaaS
+
+#### Public Cloud and IaaS
+
+Most common ones would be Amazon Elastic Compute Cloud (EC2), Azure Virtual Machine and Google Cloud Compute Engine. These services provide you with complete control of your computing resources and let you operate on their computing and infrastructure environment easily. It reduces the time required for obtaining and booting a new server’s instances to minutes, thereby allowing a quick scalable capacity and resources, up and down, as the computing requirements change. They offer different instances’ size according to the CPU and memory needs of the customers.
+
+#### Private Cloud and IaaS
+
+A private cloud aims at providing public cloud functionality, but on private resources, while maintaining control over an organization’s data and resources to meet security and governance’s requirements in an organization. The solutions for running private cloud infrastructure services that we will be looking at are **Eucalyptus** and **OpenStack**.
+
+**Eucalyptus - Elastic Utility Computing Architecture for Linking Your Programs To Useful Systems**
+
+It allows execution and control of virtual instances (Xen or KVM) on different physical resources and is compatible with AWS (EC2 + EBS + ELB + AutoScaling and S3).
+
+It consists of several UNIX services:
+- Cloud Controller (CLC)
+- Cluster Controller (CC)
+- Node Controller (NC)
+- Walrus  (like Amazon S3).
+- Storage Controller (SC)
+The services communicate via web services (SOAP+REST)
+
+![](/assets/img/other/distributed-computing-review/eucalyptus_arch.png)
+
+The NC runs on every physical node and controls the KVM hypervisor (Xen is not supported anymore since v4.0). Each NC transmits information about the utilization of their own resources to the CC of the site: Number of processors, free memmory, free storage.
+
+Exactly a single CC **per site** is required. It controls the distribution of the virtual machines to the NCs. In each site, the NCs communicate with the CC via a virtual network (VLAN).
+
+Exactly a single CLC **per Eucalyptus infrastructure** is required. It acts a meta-scheduler in the cloud infrastructure and collect resource information from the CCs. It runs on the same server as Walrus and SC.
+
+Mr. Walrus uses S3 REST API and usually store images (object-based storage). It is not a distributing service and only operates in single-node mode. Replace this guy with Riak Cloud Storage for better performance.
+
+If the infrastructure contains multiple sites, each site has its own storage controller which implements the EBS API.
+
+To launch an istance in Eucalyptus, you need to provide the CLC with three parameters: Image, Instance type, and Number of instances. CLC will select a CC, then the CC will select one ore more NCs and then commands the start of the instance(s). If the image is not available on the NC, the NC requests the image from the **CLC**. The CLC transmits the image from Mr.Walrus via SCP to the NC.
+
+Some not-so-fun facts about Eucalyptus:
+- Installation is best done on CentOS or Red Hat Enterprise Linux. Other distributions will be a nightmare.
+- Stable operation of Eucalyptus require lots of admin effort and commercial support (Skill issue and money issue).
+- The source code is horrendous and the devs will not assist you.
+- It got dumped by NASA in 2010 because it's bad. The NASA engineering team went on to build **Nova**, which is now part of the best boi **OpenStack**
+
+**OpenStack**
+
+![](/assets/img/other/distributed-computing-review/openstack_map.png)
+
+Contains several services which communicate via REST (so no SOAP).
+- Compute with **Nova**: Implements the EC2 API, highly scalable.
+- Object Storage with **Swift**: Implements the S3 API, redundant, highly scalable and allows automatic replication when nodes fail or are added.
+- Image Service with **Glance**: Service for the search, register and request of images. Formats supported: Raw, AMI, VHD (Hyper-V), VDI (VirtualBox), qcow2 (Qemu/KVM), VMDK and OVF (VMWare).
+- Block Storage with **Cinder**: Virtual storage devices can be created, erased, attached to and detached from Nova instances, implements the EBS API.
+- Networking with **Neutron**: Service for managing IP addresses and distributing them to instances.
+- Dashboard with **Horizon**: Provides a graphical web-interface for administrators and users.
+- Identity Service with **Keystone**: Central directory of users for the other OpenStack services, provides user authentication.
 
 ### PaaS
 
+Platform as a Service (PaaS) is a computing platform that abstracts the infrastructure, OS, and middleware to drive developer productivity. It offer the right tools to implement and deploy **hybrid clouds**. They provide enterprises with a platform for creating, deploying, and managing distributed applications on top of existing infrastructures. They are in charge of monitoring and managing the infrastructure and acquiring new nodes, and they rely on virtualization technologies in order to scale applications on demand. 
+
+#### Azure case study
+
+Windows Azure platform is one of PaaS vendors, based on .NET and Microsoft’s supported development tools. The platform is a group of cloud technologies, each providing a specific set of services to application developers.
+
+![](/assets/img/other/distributed-computing-review/windows-azure.png)
+
+Its major components:
+- Windows Azure: Provides a Windows-based environment for running applications and storing data on servers in Microsoft data centers.
+- SQL Azure: Provides data services in the cloud based on SQL Server.
+- AppFabric: Provides cloud services for connecting applications running in the cloud or on premises.
+
+ > Đoạn này trong Lecture 4 là có khoảng 90 slides để nói chi tiết về 3 component này của platform Windows Azure. Mình sẽ chỉ nói tóm gọn ở đây, khuyến khích các bạn xem thêm trong slide.
+{: .prompt-warning }
+
+**Windows Azure**
+
+- A foundation for Windows application on the cloud.
+- Provides Windows-based **compute** and **storage** services. The running environment is IIS 7 and .NET.
+- Compute:
+	- An app can have multiple instances, each is its own VM. Each VM is provided by a hypervisor (Hyper-V).
+	- There are two types of computation roles: **Web role** to interact with the user and **Worker role** to handle distributed tasks from the Web role. Any service must include at least one role type.
+- Storage:
+	- Provides three type of storage: **Blob** for block storage to store text or binary file, **Table** for structure-based storage, and **Queue** for slices storage that support communication between applications.
+	- Blobs are stored in containers, there are two types of Blob: **Block Blob** with segment Read/Write operation (max 4MB each block) and **Page Blob** with random Read/Write, indentify by range of up to 1TB (provided by the X-Driver).
+	- Table can be used as a lightweight database, every entry in a table has an indentifier which contains Account Key and Table Key. They also have Partition Key to specify same data on different partitions and Row Key for row data indentifying.
+	- Queue consists of slices, each slice contains 8KB data. A good example of queue is the data communication between the frontend and the backend of a web app.
+- Fabric controller:
+	- Provides an automatic and autonomous way to manage resources as well as software configuration.
+	- Each VM has a **Fabric Agent** to report the status to fabric controller.
+
+**SQL Azure**
+
+It provides a cloud-based database management system (DBMS) and data-oriented services in the cloud. The SQL Azure databse is a relational database which supports the Transact-SQL language. The maximum size of a single database is 10 GB.
+
+![](/assets/img/other/distributed-computing-review/SQL_Azure_Architecture.png)
+
+All communication uses the **TDS** protocol. Each connection between application and SQL Azure could link to different database servers => High availability.
+
+The Gateway is the critical component which handles commands and accesses data. Connecting to the gateway can access all functionalities on SQL Azure. 
+
+In the Backend, SQL Azure Fabric manages databases that stores data in many SQL Azure nodes distributively. It also controls the policy and frequency of data replication.
+
+**AppFabric**
+
+It provides cloud-based infrastructure in connecting distributed services and applications. Basically, it establishes connections between applications. It has two components:
+- **Service Bus** - Letting an application expose endpoints that can be accessed by other applications. Service Bus supports two types of communication mechanisms: **Message Reply** - The service bus sits between client and the server and **Directly Connect** - Probes a link for client to talk directly with the server.
+- **Access Control** - Provides applications with authentication and authorization. It is a Single Sign-On (SSO) service for Service Bus, the user only needs a token when accessing multiple services.
+
+#### FaaS
+
+Function as a Service, a category of PaaS. Like the name suggest, it let client run their own functions without having to manage the underlying infrastructure. It can be also called *serverless function* because the backend is invisible for the customers.
+
+These functions can be triggered by external request or events such as direct HTTP request, webhooks, MQTT events and so on. They can scale as well by running inside multiple instances.
+
+Example of public FaaS: AWS Lambda, Google Cloud Function, Azure Function.
+
+Example of private FaaS: Apache OpenWhisk and *my beloved*, OpenFaaS.
+
 ### SaaS
+
+Applications reside on the top of the cloud stack, users usually access them via web browser. It provides ready-to-run services that are deployed and configured for the user. In general, the user has no control over the underlying cloud infrastructure with the exception of limited configuration settings. A strong characteristic of SaaS services is that there is **no** client side software requirement. SaaS alleviates the burden of software maintenance for customers and simplifies development and testing for providers.
+
+A few popular SaaS providers: Google Workspace, GitHub, Salesforce, Zoho, eyeOS, etc.
+
+ > SaaS mình không thấy được nhắc tới quá nhiều trong slide lẫn sách tham khảo, có lẽ do nó đa dạng quá? Mỗi software có cấu trúc riêng và có hàng triệu software ngoài kia nên khó mà phân tích tổng quan được.
+{: .prompt-warning }
 
 ## IV. Hadoop
 
