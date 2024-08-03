@@ -146,6 +146,8 @@ collections:
   tabs:
     output: true
     sort_by: order
+  projects:
+    output: true
 
 defaults:
   - scope:

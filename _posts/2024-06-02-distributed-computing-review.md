@@ -3,7 +3,7 @@ title: Ôn tập Hệ tính toán phân bố - Một bước lên "mây"
 date: 2024-06-02 15:05:00 +0700
 authors: 
 - thu4n
-categories: [Blogging, Learning]
+categories: [UIT, Learning]
 image: /assets/img/other/distributed-computing-review/cloud-one-step.png
 tags: [cloud, distributed computing, virtualization]
 math: true

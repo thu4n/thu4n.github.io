@@ -5,7 +5,7 @@ authors:
 - thu4n
 - ahamonuser
 - howtodie
-categories: [Blogging, Learning]
+categories: [UIT, Learning]
 image: /assets/img/other/tet-cuu.png
 tags: [computer network, network security, sysadmin]
 math: true

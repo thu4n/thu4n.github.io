@@ -2,7 +2,7 @@
 title: My first time participating in Net Challenge 2022
 date: 2022-12-19 20:55:00 +0700
 author: thu4n
-categories: [Blogging, Competition]
+categories: [UIT, Competition]
 tags: [net challenge, competitions]
 ---
 ## What is Net Challenge?
