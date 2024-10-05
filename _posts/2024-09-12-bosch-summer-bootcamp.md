@@ -30,5 +30,7 @@ Roughly a week later, I received another call from HR. The call was to announce 
 
 ## Wokring at BGSV
 
-On the on-boarding day, me and a lot of other
+On the on-boarding day, me and a lot of other interns from different posistion were gathered in a seminar room to listen to the on-boarding session presented mainly by HR. I got overloaded with information on that day but to be fair, a handful of them were really important like creating digital signature or how to submit personal documents. At the end of the session, some members of my team (ETA) came to pick me up and showed me where I would be working at in the next few months. 
+
+The entire first week was me preparing required documents and setting up the provided laptop. The company's network banned a lot of stuff so it was fun for me to find out which kind software or website is allowed and which is not. There was an entire guide dedicating to **installing Unikey** in Bosch. My colleagues were all nice and supportive, they taught me how to use the *Cloud Printer* - a super advanced technology that I had never seen before.
 

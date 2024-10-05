@@ -4,7 +4,7 @@ icon: fas fa-info-circle
 image: /assets/img/other/network-cu-lao.png
 ---
 
-![banner](/assets/img/other/aboutBanner.png)
+![banner](https://github.com/thu4n/thu4n.github.io/blob/dev/assets/img/other/aboutBanner.png?raw=true)
 
 ## About me
 Just your average IT student with a habit of blogging and sometimes ranting...
