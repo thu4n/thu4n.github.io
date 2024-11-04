@@ -30,9 +30,32 @@ Roughly a week later, I received another call from HR. The call was to announce 
 
 ## Wokring at BGSV
 
+### On-boarding
+
 On the on-boarding day, me and a lot of other interns from different posistion were gathered in a seminar room to listen to the on-boarding session presented mainly by HR. I got overloaded with information on that day but to be fair, a handful of them were really important like creating digital signature or how to submit personal documents. At the end of the session, some members of my team (ETA) came to pick me up and showed me where I would be working at in the next few months. 
 
 The entire first week was me preparing required documents and setting up the provided laptop. The company's network banned a lot of stuff so it was fun for me to find out which kind software or website is allowed and which is not. There was an entire guide dedicating to **installing Unikey** in Bosch. My colleagues were all nice and supportive, they taught me how to use the *Cloud Printer* - a super advanced technology that I had never seen before. Jokes aside, I got to do lots of cool stuffs here.
 
+### The technical stuffs
+
 My main role is to build a Docker container which serves as a runtime environment for Software-Defined Vehicle prototypes. Building this took quite some time due to the fact that very few documentations were available at the time. This task helped improve my container knowledge a lot and I got the chance to know the current landscape of open source SDV development. The prototype itself is written in Python but the components interacting with it were written in Rust. The development model for such a prototype is shown in the picture below:
 
+![Velocitas Development Model](https://res.cloudinary.com/dig6xpboz/image/upload/v1730701789/programming_model_hct4rm.png)
+
+This diagram is from the [Velocitas Development Model for SDV Prototypes](https://eclipse-velocitas.github.io/velocitas-docs/docs/concepts/development_model/) and of course, it is open source so I can freely talk about this. The Docker image that I was tasked to build need to contain 95% of the things in the diagram. A brief break down is that there is a Python Software Development Kit (SDK) that allows developers to interact with vehicle physical components via Python code. These code will then often use Vehicle APIs (VSS) and there will be a broker (Kuksa Databroker) to receive these  API calls and distribute them accordingly. Networking between these services is mainly via gRPC, the MQTT part is only for cloud connection. More details are included in the link I provided, this is just the gist of it.
+
+Aside from the fact that the container should be able to run, e.g. operating with all services in the Velocitas Development Model , I think the main concern when building a Docker image is the image size. In my situation, not only does it run on a small Azure VM, it also has to run on a Raspberry Pi with limited disk storage. Obviously with the Pi comes into play, image architecture is taken into account as well. To sum up, the container requirements were:
+
+1. *It can run*.
+2. It is small (below 300MB).
+3. It support AMD64 and ARM64.
+
+For requirement #1, I can't talk much due to the main code being private. The SDK is just one `pip install`, the whole VSS system is confusing at first because some versions don't really work with the others. The broker's code was Rust so compiling it with Docker build was way too long. For some reasons, cargo - a tool which mangages and compiles Rust crates couldn't be cached normally by the Docker build toolkit. I initially resolved this by just writing a bash script to comiple the binary beforehand and copy it into the Dockerfile later. Add in a little magic, I got it up and running in my first 2 weeks at Bosch.
+
+I spent the following week fufilling requirement #2 and #3. For a smaller image, usually you start with a small base like Alpine Linux. However, some libraries that I need couldn't work with an Alpine-based image due to `musl` being its C standard library and not the popular `glibc` that we all know and love. Thereby, I went with Ubuntu 22.04 which was only about 80MB in size and it worked really well with all the libs and crates. I then apply the **multi-stage Docker build** technique which basically means that you do all the heavy work of compiling in the first stage and then copy all the artifacts into the final stage. This help reduce image size because every `RUN` command in Dockerfile is a layer in  your image so you want as few of them as possible. Another trick is to combine multiple shell commands into one `RUN` command using `&&` but this make your Dockerfile a bit harder to read so I don't really recommend it. For a multi-architecture build, I used the Docker Buildkit (`docker buildx`) with the [Moby Builder](https://github.com/moby/buildkit) as the driver. After a few steps of setup,  I could simply use `docker buildx build --platform linux/amd64,linux/arm64`.
+
+The next step is to automate the container building process with GitHub Actions. I wrote a fairly simple CI workflow which includes a matrix strategy to run the broker compiling script for AMD64 and ARM64, a few steps here and there to set up Docker and cargo cache and then just build for both architecture and push the image with the commit SHA ID (shorthand version) as the image tag. Deployment is just your usual container image pulling with the DockerHub's webhook.
+
+### Soft-skill training
+
+A perk that I got for joining the Summber Bootcamp is that the HR department prepared a training program for us to participate every week. I learned about critical thinking, presentation giving, time management and a lot more. Often, we would be split into groups and worked together to either debate or present about a certain topic. It was fun overall and some advices were really solid. Unfortunately, I couldn't join the last day of the program for celebration since I had to return to my uni for my internship report at the time.
