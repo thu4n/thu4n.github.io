@@ -36,7 +36,7 @@ On the on-boarding day, me and a lot of other interns from different posistion w
 
 The entire first week was me preparing required documents and setting up the provided laptop. The company's network banned a lot of stuff so it was fun for me to find out which kind software or website is allowed and which is not. There was an entire guide dedicating to **installing Unikey** in Bosch. My colleagues were all nice and supportive, they taught me how to use the *Cloud Printer* - a super advanced technology that I had never seen before. Jokes aside, I got to do lots of cool stuffs here.
 
-### The technical stuffs
+### SDV Runtime
 
 My main role is to build a Docker container which serves as a runtime environment for Software-Defined Vehicle prototypes. Building this took quite some time due to the fact that very few documentations were available at the time. This task helped improve my container knowledge a lot and I got the chance to know the current landscape of open source SDV development. The prototype itself is written in Python but the components interacting with it were written in Rust. The development model for such a prototype is shown in the picture below:
 
@@ -56,6 +56,20 @@ I spent the following week fufilling requirement #2 and #3. For a smaller image,
 
 The next step is to automate the container building process with GitHub Actions. I wrote a fairly simple CI workflow which includes a matrix strategy to run the broker compiling script for AMD64 and ARM64, a few steps here and there to set up Docker and cargo cache and then just build for both architecture and push the image with the commit SHA ID (shorthand version) as the image tag. Deployment is just your usual container image pulling with the DockerHub's webhook.
 
+After that, it's all about perfomance tweaking. The Docker image is publicly available at: https://hub.docker.com/r/boschvn/sdv-runtime. To this day, I'm still proud of it because it's not perfect but it's good enough for my team!
+
+### Rust compiler server
+
+Thanks to this task, I realize how much I hate Rust. Not much details I can talk about here but essentially, I have to build a server that takes in Rust code, compile it and return the binary. The core logic sounds simple but it's the application build-caching part that was a pain in the ass, especially for someone with no Rust experience! Not only that, Docker build itself is so painfully slow and hard to cache as well. I used [cargo-chef](https://github.com/LukeMathWalker/cargo-chef) for a faster Docker build but even this came with its own limitation (see the README of the project).
+
 ### Soft-skill training
 
-A perk that I got for joining the Summber Bootcamp is that the HR department prepared a training program for us to participate every week. I learned about critical thinking, presentation giving, time management and a lot more. Often, we would be split into groups and worked together to either debate or present about a certain topic. It was fun overall and some advices were really solid. Unfortunately, I couldn't join the last day of the program for celebration since I had to return to my uni for my internship report at the time.
+A perk that I got for joining the Summber Bootcamp is that the HR department prepared a training program for us to participate every week. I learned about critical thinking, presentation giving, time management and a lot more. Often, we would be split into groups and worked together to either debate or present about a certain topic. It was fun overall and some advices were really solid. Unfortunately, I couldn't join the last day of the program for celebration since I had to return to my uni for my internship report at the time. Overall, I think it was a great program, the HR team did a really good job setting this up.
+
+## End of internship and conclusion
+
+*This is written as of May 15th, 2025 (super delay, lol).*
+
+Originally, it was a 3-month internship but I got it extended to 6 months. After it ended, no conversion, unfortunately. HR told me there was no head-count at the time so there's that.
+
+I think for my first IT job ever, this went pretty well. Almost all tasks given were completed, I took ownership in my work and I didn't cause the team any trouble. Seeing how slow and complicated all the process in a big company going is certainly an experience. In conclusion, I enjoyed my stay at Bosch.
