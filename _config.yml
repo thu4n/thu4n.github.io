@@ -98,7 +98,7 @@ comments:
   # Giscus options › https://giscus.app
   giscus:
     repo:  thu4n/thu4n.github.io            # <gh-username>/<repo>
-    repo_id: R_kgDOHhvQOA
+    repo_id: 783395090
     category: Comments
     category_id: DIC_kwDOHhvQOM4CUBB4
     mapping:           # optional, default to 'pathname'
