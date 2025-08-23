@@ -1,17 +1,12 @@
 #  The contact options.
 
--
-  type: github
-  icon: 'fab fa-github'
--
-  type: facebook
-  icon: 'fab fa-facebook'   # icons powered by <https://fontawesome.com/>
-  url: 'https://facebook.com/thuanlawibu'
--
-  type: linkedin
-  icon: 'fab fa-linkedin'   # icons powered by <https://fontawesome.com/>
-  url:  'https://www.linkedin.com/in/thu4n/'  
--
-  type: email
-  icon: 'fas fa-envelope'
-  noblank: true            # open link in current tab
+- type: github
+  icon: "fab fa-github"
+
+- type: linkedin
+  icon: "fab fa-linkedin" # icons powered by <https://fontawesome.com/>
+  url: "https://www.linkedin.com/in/thu4n/"
+
+- type: email
+  icon: "fas fa-envelope"
+  noblank: true # open link in current tab
