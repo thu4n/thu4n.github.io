@@ -1,4 +1,4 @@
-## Template › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/advanced-usage.md#setting-author-url
+## Template > https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/advanced-usage.md#setting-author-url
 # -------------------------------------
 # {author_id}:
 #   name: {full name}
@@ -8,7 +8,6 @@
 
 thu4n:
   name: thu4n
-  facebook: thuanlawibu
   url: https://github.com/thu4n
 ahamonuser:
   name: ahamonuser
