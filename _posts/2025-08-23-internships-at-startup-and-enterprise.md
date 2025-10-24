@@ -4,12 +4,12 @@ date: 2025-08-23 20:40:00 +0700
 authors: 
 - thu4n
 categories: [Work Experiences, Internship]
-image: https://res.cloudinary.com/dig6xpboz/image/upload/v1726217517/thu4nAtBosch_qrqxge.jpg
+image: https://res.cloudinary.com/dig6xpboz/image/upload/v1761321947/IMG_6562_px2snn.jpg
 tags: [intern, devops engineer]
 math: true
 ---
 
-After nearly a year since the last blog, I am back and still an intern (maybe senior intern). What's great is that I got the chance to explore multiple working cultures and environments in such a short span of time. Even though it's only a few months in each of these places, there were notable differences between them that inspired me to make this blog. 
+After nearly a year since the last blog, I am back and still an intern (maybe senior intern). What's great is that I got the chance to explore multiple working cultures and environments in such a short span of time. Even though it's only a few months in each of these places, there were notable differences between them that inspired me to make this blog.
 
 ## A little backstory
 
