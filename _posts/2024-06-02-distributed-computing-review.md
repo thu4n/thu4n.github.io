@@ -695,18 +695,3 @@ Bài blog tới đây là hết, cảm ơn tất cả những ai đã dành th�
 2. Ebook Distributed system (4th): [https://www.distributed-systems.net/index.php/books/ds4/](https://www.distributed-systems.net/index.php/books/ds4/)
 3. [Apache MapReduce Tutorial](https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.html)
 4. [Apache HDFS Design](https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
